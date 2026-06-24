@@ -1,11 +1,19 @@
 import { Header } from "@/components/layout/Header";
 import { DashboardClient } from "@/components/dashboard/DashboardClient";
+import { getAppwriteErrorMessage } from "@/lib/appwrite/errors";
 import { getRecipes } from "@/lib/appwrite/recipes";
 import { isAppwriteConfigured } from "@/lib/appwrite/server";
 
 export default async function HomePage() {
-  const recipes = await getRecipes();
   const configured = isAppwriteConfigured();
+  let recipes: Awaited<ReturnType<typeof getRecipes>> = [];
+  let appwriteError: string | undefined;
+
+  try {
+    recipes = await getRecipes();
+  } catch (error) {
+    appwriteError = getAppwriteErrorMessage(error);
+  }
 
   return (
     <>
@@ -19,7 +27,11 @@ export default async function HomePage() {
             Family favorites, saved links, and kitchen notes.
           </p>
         </div>
-        <DashboardClient recipes={recipes} configured={configured} />
+        <DashboardClient
+          recipes={recipes}
+          configured={configured}
+          error={appwriteError}
+        />
       </main>
     </>
   );

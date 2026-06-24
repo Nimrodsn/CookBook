@@ -13,9 +13,14 @@ import { collectAllTags, matchesSearch } from "@/lib/utils";
 type DashboardClientProps = {
   recipes: Recipe[];
   configured: boolean;
+  error?: string;
 };
 
-export function DashboardClient({ recipes, configured }: DashboardClientProps) {
+export function DashboardClient({
+  recipes,
+  configured,
+  error,
+}: DashboardClientProps) {
   const [activeTab, setActiveTab] = useState<TabId>("all");
   const [search, setSearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
@@ -48,7 +53,14 @@ export function DashboardClient({ recipes, configured }: DashboardClientProps) {
 
   return (
     <div className="space-y-4">
-      {!configured && (
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <strong className="font-medium">Appwrite connection error:</strong>{" "}
+          {error}
+        </div>
+      )}
+
+      {!configured && !error && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           Appwrite is not configured. Copy{" "}
           <code className="rounded bg-amber-100 px-1">.env.local.example</code>{" "}
