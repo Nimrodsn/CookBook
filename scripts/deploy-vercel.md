@@ -29,6 +29,8 @@ Add these in **Project Settings → Environment Variables** for Production, Prev
 | `APPWRITE_DATABASE_ID` | Database ID |
 | `APPWRITE_RECIPES_COLLECTION_ID` | Collection ID |
 | `APPWRITE_STORAGE_BUCKET_ID` | Bucket ID |
+| `GEMINI_API_KEY` | Google AI Studio API key — mark as sensitive (see `scripts/setup-ai-scan.md`) |
+| `GEMINI_MODEL` | Optional — default `gemini-2.0-flash` |
 
 ## 4. Deploy
 
@@ -41,9 +43,11 @@ Click **Deploy**. Vercel runs `next build` automatically.
 - [ ] Save an external link (test scrape API)
 - [ ] Filters and search work on mobile viewport
 - [ ] Edit and delete a recipe
+- [ ] Scan a recipe photo from your phone (requires `GEMINI_API_KEY` — see `scripts/setup-ai-scan.md`)
 
 ## Notes
 
 - The scrape API runs server-side on Vercel. Some websites block datacenter IPs — users can always enter title/image manually.
 - Appwrite preview URLs require the project ID in the query string (handled automatically).
 - For custom Appwrite Cloud regions, update `NEXT_PUBLIC_APPWRITE_ENDPOINT` accordingly.
+- Recipe scanning uses Google Gemini API — works on Vercel with no home PC or tunnel required.

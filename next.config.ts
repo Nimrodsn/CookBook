@@ -1,4 +1,17 @@
 import type { NextConfig } from "next";
+import os from "os";
+
+function getLocalIPv4s(): string[] {
+  const ips: string[] = [];
+  for (const iface of Object.values(os.networkInterfaces())) {
+    for (const addr of iface ?? []) {
+      if (addr.family === "IPv4" && !addr.internal) {
+        ips.push(addr.address);
+      }
+    }
+  }
+  return ips;
+}
 
 const appwriteHostname = (() => {
   try {
@@ -14,6 +27,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  // Allow dev access from phone via LAN IP (e.g. http://192.168.1.x:3048)
+  allowedDevOrigins: getLocalIPv4s(),
   images: {
     remotePatterns: [
       ...(appwriteHostname
