@@ -47,7 +47,7 @@ Create each attribute with these exact settings:
 | `url` | URL | 2048 | No |
 | `image_url` | URL | 2048 | No |
 | `image_file_id` | String | 64 | No |
-| `category` | Enum | Elements: `meat`, `vegetarian`, `dessert`, `gluten_free`, `dairy` | Yes |
+| `category` | Enum | Elements: `meat`, `vegetarian`, `dessert`, `gluten_free`, `dairy`, `salad` | Yes |
 | `tags` | String Array | Max 20 elements, 64 chars each | No |
 | `ingredients` | String | 10000 | No |
 | `instructions` | String | 20000 | No |

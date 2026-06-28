@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { CategoryChipFilter } from "@/components/filters/CategoryChipFilter";
 import { FilterDrawer } from "@/components/filters/FilterDrawer";
 import { SearchBar } from "@/components/filters/SearchBar";
 import { RecipeGrid } from "@/components/dashboard/RecipeGrid";
@@ -70,6 +71,11 @@ export function DashboardClient({
       )}
 
       <TabNav activeTab={activeTab} onChange={setActiveTab} />
+
+      <CategoryChipFilter
+        selectedCategories={selectedCategories}
+        onChange={setSelectedCategories}
+      />
 
       <div className="flex gap-2">
         <div className="flex-1">

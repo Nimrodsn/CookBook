@@ -4,6 +4,7 @@ export const CATEGORIES = {
   dessert: { en: "Dessert", he: "קינוח" },
   gluten_free: { en: "Gluten-Free", he: "ללא גלוטן" },
   dairy: { en: "Dairy", he: "חלבי" },
+  salad: { en: "Salad", he: "סלט" },
 } as const;
 
 export type CategoryId = keyof typeof CATEGORIES;

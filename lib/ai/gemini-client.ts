@@ -11,7 +11,7 @@ Extract the recipe and respond with ONLY valid JSON in this exact shape:
   "title": "recipe name",
   "ingredients": "one ingredient per line",
   "instructions": "one step per line",
-  "category": "one of: meat, vegetarian, dessert, gluten_free, dairy — or null if unsure",
+  "category": "one of: meat, vegetarian, dessert, gluten_free, dairy, salad — or null if unsure",
   "tags": ["optional", "short", "tags"]
 }
 
