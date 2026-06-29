@@ -9,9 +9,9 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
-import { CATEGORY_IDS, CATEGORIES } from "@/lib/constants";
+import { CategorySelect } from "@/components/forms/CategorySelect";
+import { RecipePhotosField } from "@/components/forms/RecipePhotosField";
 
 const initialState: ActionState = {};
 
@@ -34,16 +34,7 @@ export function LocalRecipeForm() {
       </Field>
 
       <Field label="Category">
-        <Select name="category" required defaultValue="">
-          <option value="" disabled>
-            Select a category
-          </option>
-          {CATEGORY_IDS.map((id) => (
-            <option key={id} value={id}>
-              {CATEGORIES[id].en} ({CATEGORIES[id].he})
-            </option>
-          ))}
-        </Select>
+        <CategorySelect />
       </Field>
 
       <Field label="Tags" hint="Comma-separated, e.g. Quick, Kids Love, Shabbat">
@@ -66,14 +57,7 @@ export function LocalRecipeForm() {
         />
       </Field>
 
-      <Field label="Photo">
-        <Input
-          name="image"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          className="file:mr-4 file:rounded-lg file:border-0 file:bg-terracotta file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-terracotta-light"
-        />
-      </Field>
+      <RecipePhotosField mode="local" />
 
       <div className="flex gap-3 pt-2">
         <Button type="submit" disabled={pending} className="flex-1">

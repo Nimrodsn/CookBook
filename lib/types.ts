@@ -1,4 +1,12 @@
-import type { CategoryId, RecipeType } from "./constants";
+import type { RecipeType } from "./constants";
+
+export interface Category {
+  $id: string;
+  slug: string;
+  label_en: string;
+  label_he: string;
+  sort_order: number;
+}
 
 export interface Recipe {
   $id: string;
@@ -9,7 +17,9 @@ export interface Recipe {
   url?: string | null;
   image_url?: string | null;
   image_file_id?: string | null;
-  category: CategoryId;
+  image_urls?: string[];
+  image_file_ids?: string[];
+  category: string;
   tags: string[];
   ingredients?: string | null;
   instructions?: string | null;

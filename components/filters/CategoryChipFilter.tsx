@@ -1,6 +1,6 @@
 "use client";
 
-import { CATEGORY_IDS, CATEGORIES } from "@/lib/constants";
+import { useCategories } from "@/components/providers/CategoriesProvider";
 import { cn } from "@/lib/utils";
 
 type CategoryChipFilterProps = {
@@ -12,12 +12,18 @@ export function CategoryChipFilter({
   selectedCategories,
   onChange,
 }: CategoryChipFilterProps) {
-  function toggleCategory(id: string) {
-    if (selectedCategories.includes(id)) {
-      onChange(selectedCategories.filter((c) => c !== id));
+  const { categories } = useCategories();
+
+  function toggleCategory(slug: string) {
+    if (selectedCategories.includes(slug)) {
+      onChange(selectedCategories.filter((category) => category !== slug));
     } else {
-      onChange([...selectedCategories, id]);
+      onChange([...selectedCategories, slug]);
     }
+  }
+
+  if (categories.length === 0) {
+    return null;
   }
 
   return (
@@ -26,15 +32,14 @@ export function CategoryChipFilter({
       role="group"
       aria-label="Filter by category"
     >
-      {CATEGORY_IDS.map((id) => {
-        const selected = selectedCategories.includes(id);
-        const { en, he } = CATEGORIES[id];
+      {categories.map((category) => {
+        const selected = selectedCategories.includes(category.slug);
 
         return (
           <button
-            key={id}
+            key={category.slug}
             type="button"
-            onClick={() => toggleCategory(id)}
+            onClick={() => toggleCategory(category.slug)}
             aria-pressed={selected}
             className={cn(
               "min-h-11 shrink-0 rounded-full px-4 text-sm font-medium transition-colors",
@@ -44,9 +49,9 @@ export function CategoryChipFilter({
             )}
           >
             <span className="whitespace-nowrap">
-              {en}{" "}
+              {category.label_en}{" "}
               <span className={selected ? "text-white/90" : "text-stone"}>
-                ({he})
+                ({category.label_he})
               </span>
             </span>
           </button>

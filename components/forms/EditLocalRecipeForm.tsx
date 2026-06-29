@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   updateLocalRecipe,
@@ -10,11 +9,11 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
-import { CATEGORY_IDS, CATEGORIES } from "@/lib/constants";
+import { CategorySelect } from "@/components/forms/CategorySelect";
+import { RecipePhotosField } from "@/components/forms/RecipePhotosField";
 import type { Recipe } from "@/lib/types";
-import { formatTagsForInput, getRecipeImageUrl } from "@/lib/utils";
+import { formatTagsForInput, getRecipeImages } from "@/lib/utils";
 
 type EditLocalRecipeFormProps = {
   recipe: Recipe;
@@ -27,7 +26,7 @@ export function EditLocalRecipeForm({ recipe }: EditLocalRecipeFormProps) {
     {},
   );
 
-  const imageUrl = getRecipeImageUrl(recipe);
+  const existingImages = getRecipeImages(recipe);
 
   return (
     <form action={formAction} className="space-y-5">
@@ -42,13 +41,7 @@ export function EditLocalRecipeForm({ recipe }: EditLocalRecipeFormProps) {
       </Field>
 
       <Field label="Category">
-        <Select name="category" required defaultValue={recipe.category}>
-          {CATEGORY_IDS.map((id) => (
-            <option key={id} value={id}>
-              {CATEGORIES[id].en} ({CATEGORIES[id].he})
-            </option>
-          ))}
-        </Select>
+        <CategorySelect defaultValue={recipe.category} />
       </Field>
 
       <Field label="Tags" hint="Comma-separated">
@@ -74,26 +67,12 @@ export function EditLocalRecipeForm({ recipe }: EditLocalRecipeFormProps) {
         />
       </Field>
 
-      {imageUrl && (
-        <div className="relative aspect-video overflow-hidden rounded-xl border border-stone/15">
-          <Image
-            src={imageUrl}
-            alt={recipe.title}
-            fill
-            className="object-cover"
-            unoptimized
-          />
-        </div>
-      )}
-
-      <Field label="Replace Photo (optional)">
-        <Input
-          name="image"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          className="file:mr-4 file:rounded-lg file:border-0 file:bg-terracotta file:px-4 file:py-2 file:text-sm file:font-medium file:text-white"
-        />
-      </Field>
+      <RecipePhotosField
+        mode="local"
+        label="Photos"
+        hint="Add, remove, or replace photos. The first photo is the cover."
+        initialImages={existingImages}
+      />
 
       <div className="flex gap-3 pt-2">
         <Button type="submit" disabled={pending} className="flex-1">

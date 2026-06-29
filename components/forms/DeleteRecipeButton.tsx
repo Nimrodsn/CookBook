@@ -17,7 +17,7 @@ export function DeleteRecipeButton({ recipe }: DeleteRecipeButtonProps) {
     ) {
       return;
     }
-    await removeRecipe(recipe.$id, recipe.image_file_id);
+    await removeRecipe(recipe.$id);
   }
 
   return (

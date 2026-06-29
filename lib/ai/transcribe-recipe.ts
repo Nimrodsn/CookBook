@@ -1,18 +1,18 @@
 import sharp from "sharp";
-import { CATEGORY_IDS } from "@/lib/constants";
+import {
+  getCategories,
+  getCategorySlugs,
+  seedDefaultCategories,
+} from "@/lib/appwrite/categories";
 import {
   transcribedRecipeSchema,
   type TranscribedRecipeResponse,
 } from "@/lib/validations/transcription";
 import { AiError } from "./errors";
-import { generateRecipeFromImage, RECIPE_PROMPT } from "./gemini-client";
+import { buildRecipePrompt, generateRecipeFromImage } from "./gemini-client";
 
 const MAX_IMAGE_WIDTH = 1024;
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-const STRICT_RETRY_PROMPT = `${RECIPE_PROMPT}
-
-IMPORTANT: Return ONLY raw JSON. No markdown, no code fences, no explanation.`;
 
 export async function resizeRecipeImage(buffer: Buffer): Promise<{
   base64: string;
@@ -41,7 +41,16 @@ export function validateImageFile(file: File): string | null {
   return null;
 }
 
-function parseRecipeJson(raw: string): TranscribedRecipeResponse {
+async function getRecipePrompt(): Promise<string> {
+  await seedDefaultCategories();
+  const categories = await getCategories();
+  return buildRecipePrompt(getCategorySlugs(categories));
+}
+
+function parseRecipeJson(
+  raw: string,
+  allowedSlugs: string[],
+): TranscribedRecipeResponse {
   let jsonStr = raw.trim();
 
   const fenceMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -77,7 +86,7 @@ function parseRecipeJson(raw: string): TranscribedRecipeResponse {
   }
 
   const category =
-    data.category && CATEGORY_IDS.includes(data.category) ? data.category : null;
+    data.category && allowedSlugs.includes(data.category) ? data.category : null;
 
   return {
     title: data.title,
@@ -93,10 +102,15 @@ export async function transcribeRecipeImage(
   imageBuffer: Buffer,
 ): Promise<TranscribedRecipeResponse> {
   const { base64, mimeType } = await resizeRecipeImage(imageBuffer);
+  const prompt = await getRecipePrompt();
+  const allowedSlugs = getCategorySlugs(await getCategories());
+  const strictRetryPrompt = `${prompt}
+
+IMPORTANT: Return ONLY raw JSON. No markdown, no code fences, no explanation.`;
 
   try {
-    const raw = await generateRecipeFromImage(base64, mimeType);
-    return parseRecipeJson(raw);
+    const raw = await generateRecipeFromImage(base64, mimeType, prompt);
+    return parseRecipeJson(raw, allowedSlugs);
   } catch (firstError) {
     if (
       firstError instanceof AiError &&
@@ -108,8 +122,8 @@ export async function transcribeRecipeImage(
     const raw = await generateRecipeFromImage(
       base64,
       mimeType,
-      STRICT_RETRY_PROMPT,
+      strictRetryPrompt,
     );
-    return parseRecipeJson(raw);
+    return parseRecipeJson(raw, allowedSlugs);
   }
 }

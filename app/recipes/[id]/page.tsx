@@ -1,13 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CategoryLabels } from "@/components/categories/CategoryLabels";
 import { Header } from "@/components/layout/Header";
 import { DeleteRecipeButton } from "@/components/forms/DeleteRecipeButton";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { getRecipe } from "@/lib/appwrite/recipes";
-import { CATEGORIES } from "@/lib/constants";
-import { getRecipeImageUrl } from "@/lib/utils";
+import { getRecipeImages } from "@/lib/utils";
 
 type RecipeDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -21,8 +21,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
     notFound();
   }
 
-  const imageUrl = getRecipeImageUrl(recipe);
-  const category = CATEGORIES[recipe.category];
+  const images = getRecipeImages(recipe);
 
   return (
     <>
@@ -42,16 +41,36 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           </div>
         </div>
 
-        {imageUrl && (
-          <div className="relative mb-6 aspect-video overflow-hidden rounded-2xl border border-stone/15">
-            <Image
-              src={imageUrl}
-              alt={recipe.title}
-              fill
-              className="object-cover"
-              priority
-              unoptimized
-            />
+        {images.length > 0 && (
+          <div className="mb-6 space-y-3">
+            <div className="relative aspect-video overflow-hidden rounded-2xl border border-stone/15">
+              <Image
+                src={images[0].url}
+                alt={recipe.title}
+                fill
+                className="object-cover"
+                priority
+                unoptimized
+              />
+            </div>
+            {images.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto pb-1">
+                {images.slice(1).map((image) => (
+                  <div
+                    key={image.url}
+                    className="relative h-28 w-40 shrink-0 overflow-hidden rounded-xl border border-stone/15"
+                  >
+                    <Image
+                      src={image.url}
+                      alt={`${recipe.title} photo`}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -62,7 +81,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
             </h1>
             <div className="mt-3 flex flex-wrap gap-2">
               <Badge variant="category">
-                {category.en} · {category.he}
+                <CategoryLabels slug={recipe.category} variant="text" />
               </Badge>
               <Badge variant="type">
                 {recipe.type === "local" ? "My Creation" : "Saved Link"}

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useCategories } from "@/components/providers/CategoriesProvider";
 import { Button } from "@/components/ui/Button";
-import { CATEGORY_IDS, CATEGORIES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 type FilterDrawerProps = {
@@ -24,6 +24,7 @@ export function FilterDrawer({
   onTagsChange,
   allTags,
 }: FilterDrawerProps) {
+  const { categories } = useCategories();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -47,11 +48,11 @@ export function FilterDrawer({
 
   if (!open) return null;
 
-  function toggleCategory(id: string) {
-    if (selectedCategories.includes(id)) {
-      onCategoriesChange(selectedCategories.filter((c) => c !== id));
+  function toggleCategory(slug: string) {
+    if (selectedCategories.includes(slug)) {
+      onCategoriesChange(selectedCategories.filter((category) => category !== slug));
     } else {
-      onCategoriesChange([...selectedCategories, id]);
+      onCategoriesChange([...selectedCategories, slug]);
     }
   }
 
@@ -97,30 +98,32 @@ export function FilterDrawer({
         </div>
 
         <div className="flex-1 space-y-6 overflow-y-auto px-4 py-4">
-          <section>
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-stone">
-              Category
-            </h3>
-            <div className="space-y-2">
-              {CATEGORY_IDS.map((id) => (
-                <label
-                  key={id}
-                  className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-2 hover:bg-cream"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(id)}
-                    onChange={() => toggleCategory(id)}
-                    className="h-4 w-4 rounded border-stone/40 text-terracotta focus:ring-terracotta"
-                  />
-                  <span className="text-sm">
-                    {CATEGORIES[id].en}{" "}
-                    <span className="text-stone">({CATEGORIES[id].he})</span>
-                  </span>
-                </label>
-              ))}
-            </div>
-          </section>
+          {categories.length > 0 && (
+            <section>
+              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-stone">
+                Category
+              </h3>
+              <div className="space-y-2">
+                {categories.map((category) => (
+                  <label
+                    key={category.slug}
+                    className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-2 hover:bg-cream"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.includes(category.slug)}
+                      onChange={() => toggleCategory(category.slug)}
+                      className="h-4 w-4 rounded border-stone/40 text-terracotta focus:ring-terracotta"
+                    />
+                    <span className="text-sm">
+                      {category.label_en}{" "}
+                      <span className="text-stone">({category.label_he})</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </section>
+          )}
 
           {allTags.length > 0 && (
             <section>

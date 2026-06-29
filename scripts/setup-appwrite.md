@@ -47,7 +47,9 @@ Create each attribute with these exact settings:
 | `url` | URL | 2048 | No |
 | `image_url` | URL | 2048 | No |
 | `image_file_id` | String | 64 | No |
-| `category` | Enum | Elements: `meat`, `vegetarian`, `dessert`, `gluten_free`, `dairy`, `salad` | Yes |
+| `image_urls` | String Array | Max 10 elements | No |
+| `image_file_ids` | String Array | Max 10 elements, 64 chars each | No |
+| `category` | String | 64 | Yes |
 | `tags` | String Array | Max 20 elements, 64 chars each | No |
 | `ingredients` | String | 10000 | No |
 | `instructions` | String | 20000 | No |
@@ -66,7 +68,31 @@ Create these indexes on the `recipes` collection:
 
 Leave **no** role permissions on the collection (no `Any` read/write). All access goes through the server API key.
 
-## 5. Create the Storage Bucket
+## 5. Create the `categories` Collection
+
+1. Inside the `cookbook` database, create a collection named `categories`.
+2. Copy the **Collection ID** → `APPWRITE_CATEGORIES_COLLECTION_ID`
+
+### Collection Attributes
+
+| Key | Type | Size / Config | Required |
+|-----|------|---------------|----------|
+| `slug` | String | 64 | Yes |
+| `label_en` | String | 128 | Yes |
+| `label_he` | String | 128 | Yes |
+| `sort_order` | Integer | min 0 | No |
+
+Use each category's `slug` as the **document ID** when creating documents (the app does this automatically).
+
+### Permissions
+
+Leave **no** role permissions on the collection.
+
+### Existing deployments
+
+If `recipes.category` was created as an **Enum**, change it to **String** (64 chars) in Appwrite Console. Existing slug values (`meat`, `soup`, etc.) remain valid.
+
+## 6. Create the Storage Bucket
 
 1. Go to **Storage → Create Bucket**.
 2. Name: `recipe-images`
@@ -76,7 +102,7 @@ Leave **no** role permissions on the collection (no `Any` read/write). All acces
    - **Allowed file extensions:** `jpg`, `jpeg`, `png`, `webp`
 5. Leave **no** public file permissions. The server API key handles uploads; preview URLs are stored in `image_url`.
 
-## 6. Environment Variables
+## 7. Environment Variables
 
 Copy `.env.local.example` to `.env.local` and fill in:
 
@@ -86,12 +112,13 @@ NEXT_PUBLIC_APPWRITE_PROJECT_ID=your_project_id
 APPWRITE_API_KEY=your_server_api_key
 APPWRITE_DATABASE_ID=your_database_id
 APPWRITE_RECIPES_COLLECTION_ID=your_collection_id
+APPWRITE_CATEGORIES_COLLECTION_ID=your_categories_collection_id
 APPWRITE_STORAGE_BUCKET_ID=your_bucket_id
 ```
 
 Restart the dev server after updating `.env.local`.
 
-## 7. Verify
+## 8. Verify
 
 1. Run `npm run dev`.
 2. Add a local recipe with an image.

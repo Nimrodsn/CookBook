@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useCallback, useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   createExternalRecipe,
@@ -10,9 +9,9 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
-import { CATEGORY_IDS, CATEGORIES } from "@/lib/constants";
+import { RecipePhotosField } from "@/components/forms/RecipePhotosField";
+import { CategorySelect } from "@/components/forms/CategorySelect";
 
 const initialState: ActionState = {};
 
@@ -23,7 +22,7 @@ export function LinkRecipeForm() {
   );
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrls, setImageUrls] = useState<string[]>([""]);
   const [scraping, setScraping] = useState(false);
   const [scrapeError, setScrapeError] = useState("");
 
@@ -47,7 +46,13 @@ export function LinkRecipeForm() {
 
       const data = await res.json();
       if (data.title) setTitle(data.title);
-      if (data.image) setImageUrl(data.image);
+      if (data.image) {
+        setImageUrls((current) => {
+          const withoutEmpty = current.filter(Boolean);
+          if (withoutEmpty.includes(data.image)) return current;
+          return [data.image, ...withoutEmpty];
+        });
+      }
       if (!data.title && !data.image) {
         setScrapeError("No preview found. You can still save with a custom title.");
       }
@@ -93,19 +98,12 @@ export function LinkRecipeForm() {
         )}
       </Field>
 
-      {imageUrl && (
-        <div className="relative aspect-video overflow-hidden rounded-xl border border-stone/15">
-          <Image
-            src={imageUrl}
-            alt="Recipe preview"
-            fill
-            className="object-cover"
-            unoptimized
-          />
-        </div>
-      )}
-
-      <input type="hidden" name="image_url" value={imageUrl} />
+      <RecipePhotosField
+        mode="external"
+        imageUrls={imageUrls}
+        onImageUrlsChange={setImageUrls}
+        hint="Scraped preview fills the first URL. Add more image links if needed."
+      />
 
       <Field label="Title">
         <Input
@@ -118,16 +116,7 @@ export function LinkRecipeForm() {
       </Field>
 
       <Field label="Category">
-        <Select name="category" required defaultValue="">
-          <option value="" disabled>
-            Select a category
-          </option>
-          {CATEGORY_IDS.map((id) => (
-            <option key={id} value={id}>
-              {CATEGORIES[id].en} ({CATEGORIES[id].he})
-            </option>
-          ))}
-        </Select>
+        <CategorySelect />
       </Field>
 
       <Field label="Tags" hint="Comma-separated">

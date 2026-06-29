@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -10,9 +10,9 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
-import { CATEGORY_IDS, CATEGORIES, type CategoryId } from "@/lib/constants";
+import { RecipePhotosField } from "@/components/forms/RecipePhotosField";
+import { CategorySelect } from "@/components/forms/CategorySelect";
 import type { TranscribedRecipeResponse } from "@/lib/validations/transcription";
 import { formatTagsForInput } from "@/lib/utils";
 
@@ -29,26 +29,17 @@ export function ScanRecipeForm() {
   const [warning, setWarning] = useState("");
 
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<CategoryId | "">("");
+  const [category, setCategory] = useState("");
   const [tags, setTags] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [instructions, setInstructions] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const hiddenImageRef = useRef<HTMLInputElement>(null);
 
   const [state, formAction, pending] = useActionState(
     createLocalRecipe,
     initialState,
   );
-
-  useEffect(() => {
-    if (hiddenImageRef.current && imageFile) {
-      const dt = new DataTransfer();
-      dt.items.add(imageFile);
-      hiddenImageRef.current.files = dt.files;
-    }
-  }, [imageFile, step]);
 
   function handleImageSelect(file: File | null) {
     if (!file) return;
@@ -176,24 +167,11 @@ export function ScanRecipeForm() {
         </div>
       )}
 
-      {previewUrl && (
-        <div className="relative aspect-video overflow-hidden rounded-xl border border-stone/15">
-          <Image
-            src={previewUrl}
-            alt="Scanned recipe"
-            fill
-            className="object-cover"
-            unoptimized
-          />
-        </div>
-      )}
-
-      <input
-        ref={hiddenImageRef}
-        type="file"
-        name="image"
-        accept="image/jpeg,image/png,image/webp"
-        className="hidden"
+      <RecipePhotosField
+        mode="local"
+        label="Photos"
+        hint="The scanned photo is included. Add more photos before saving if needed."
+        seedFiles={imageFile ? [imageFile] : []}
       />
 
       <Field label="Title">
@@ -206,21 +184,10 @@ export function ScanRecipeForm() {
       </Field>
 
       <Field label="Category">
-        <Select
-          name="category"
-          required
+        <CategorySelect
           value={category}
-          onChange={(e) => setCategory(e.target.value as CategoryId)}
-        >
-          <option value="" disabled>
-            Select a category
-          </option>
-          {CATEGORY_IDS.map((id) => (
-            <option key={id} value={id}>
-              {CATEGORIES[id].en} ({CATEGORIES[id].he})
-            </option>
-          ))}
-        </Select>
+          onChange={(event) => setCategory(event.target.value)}
+        />
       </Field>
 
       <Field label="Tags" hint="Comma-separated">

@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { CategoryInitial, CategoryLabels } from "@/components/categories/CategoryLabels";
 import { Badge } from "@/components/ui/Badge";
-import { CATEGORIES } from "@/lib/constants";
 import type { Recipe } from "@/lib/types";
 import { getRecipeImageUrl } from "@/lib/utils";
 
@@ -29,7 +29,6 @@ function TypeIcon({ type }: { type: Recipe["type"] }) {
 
 export function RecipeCard({ recipe }: RecipeCardProps) {
   const imageUrl = getRecipeImageUrl(recipe);
-  const category = CATEGORIES[recipe.category];
   const visibleTags = recipe.tags?.slice(0, 3) ?? [];
   const extraTags = (recipe.tags?.length ?? 0) - visibleTags.length;
 
@@ -50,7 +49,9 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
           />
         ) : (
           <div className="flex h-full items-center justify-center text-stone/50">
-            <span className="font-display text-4xl">{category.he.charAt(0)}</span>
+            <span className="font-display text-4xl">
+              <CategoryInitial slug={recipe.category} />
+            </span>
           </div>
         )}
         <div className="absolute right-2 top-2 rounded-full bg-white/90 p-1.5 text-stone shadow-sm">
@@ -61,7 +62,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         <h3 className="font-display line-clamp-2 text-lg font-semibold leading-snug text-espresso group-hover:text-terracotta">
           {recipe.title}
         </h3>
-        <Badge variant="category">{category.he}</Badge>
+        <CategoryLabels slug={recipe.category} />
         {visibleTags.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {visibleTags.map((tag) => (

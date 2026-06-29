@@ -4,14 +4,20 @@ import { AiError } from "./errors";
 const DEFAULT_MODEL = "gemini-2.0-flash";
 const REQUEST_TIMEOUT_MS = 60_000;
 
-export const RECIPE_PROMPT = `You are a recipe transcription assistant. Read this image of a recipe (handwritten or printed, in any language including Hebrew).
+export function buildRecipePrompt(categorySlugs: string[]): string {
+  const categoryList =
+    categorySlugs.length > 0
+      ? categorySlugs.join(", ")
+      : "meat, vegetarian, dessert, gluten_free, dairy, salad, soup, side_dish";
+
+  return `You are a recipe transcription assistant. Read this image of a recipe (handwritten or printed, in any language including Hebrew).
 
 Extract the recipe and respond with ONLY valid JSON in this exact shape:
 {
   "title": "recipe name",
   "ingredients": "one ingredient per line",
   "instructions": "one step per line",
-  "category": "one of: meat, vegetarian, dessert, gluten_free, dairy, salad — or null if unsure",
+  "category": "one of: ${categoryList} — or null if unsure",
   "tags": ["optional", "short", "tags"]
 }
 
@@ -19,7 +25,10 @@ Rules:
 - Preserve the original language (Hebrew, English, or mixed).
 - Use \\n for line breaks inside ingredients and instructions strings.
 - If text is unclear, do your best and do not invent ingredients.
-- category must be exactly one of the enum values or null.`;
+- category must be exactly one of the slug values or null.`;
+}
+
+export const RECIPE_PROMPT = buildRecipePrompt([]);
 
 export function getGeminiApiKey(): string {
   const key = process.env.GEMINI_API_KEY?.trim();

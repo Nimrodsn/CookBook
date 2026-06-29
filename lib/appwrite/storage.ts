@@ -1,5 +1,6 @@
 import { ID } from "node-appwrite";
 import { InputFile } from "node-appwrite/file";
+import { MAX_RECIPE_IMAGES } from "@/lib/constants";
 import {
   BUCKET_ID,
   getEndpoint,
@@ -31,6 +32,20 @@ export async function uploadRecipeImage(file: File): Promise<{
     fileId: uploaded.$id,
     previewUrl: getFilePreviewUrl(uploaded.$id),
   };
+}
+
+export async function uploadRecipeImages(
+  files: File[],
+): Promise<Array<{ fileId: string; previewUrl: string }>> {
+  if (files.length > MAX_RECIPE_IMAGES) {
+    throw new Error(`Maximum ${MAX_RECIPE_IMAGES} photos allowed`);
+  }
+
+  const uploads: Array<{ fileId: string; previewUrl: string }> = [];
+  for (const file of files) {
+    uploads.push(await uploadRecipeImage(file));
+  }
+  return uploads;
 }
 
 export async function deleteRecipeImage(fileId: string): Promise<void> {

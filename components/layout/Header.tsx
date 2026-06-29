@@ -9,6 +9,11 @@ export function Header() {
           Family Cookbook
         </Link>
         <div className="flex items-center gap-2">
+          <Link href="/categories" className="hidden sm:block">
+            <Button variant="secondary" size="sm">
+              Categories
+            </Button>
+          </Link>
           <Link href="/recipes/scan">
             <Button variant="secondary" size="sm" className="sm:hidden">
               Scan

@@ -15,6 +15,7 @@ export function isAppwriteConfigured(): boolean {
       process.env.APPWRITE_API_KEY &&
       process.env.APPWRITE_DATABASE_ID &&
       process.env.APPWRITE_RECIPES_COLLECTION_ID &&
+      process.env.APPWRITE_CATEGORIES_COLLECTION_ID &&
       process.env.APPWRITE_STORAGE_BUCKET_ID,
   );
 }
@@ -31,6 +32,7 @@ export const storage = new Storage(client);
 
 export const DB_ID = process.env.APPWRITE_DATABASE_ID ?? "";
 export const RECIPES_COL = process.env.APPWRITE_RECIPES_COLLECTION_ID ?? "";
+export const CATEGORIES_COL = process.env.APPWRITE_CATEGORIES_COLLECTION_ID ?? "";
 export const BUCKET_ID = process.env.APPWRITE_STORAGE_BUCKET_ID ?? "";
 
 export function getProjectId(): string {

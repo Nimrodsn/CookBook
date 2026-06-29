@@ -1,7 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
-import Image from "next/image";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import {
   updateExternalRecipe,
@@ -10,11 +9,11 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
-import { CATEGORY_IDS, CATEGORIES } from "@/lib/constants";
+import { RecipePhotosField } from "@/components/forms/RecipePhotosField";
+import { CategorySelect } from "@/components/forms/CategorySelect";
 import type { Recipe } from "@/lib/types";
-import { formatTagsForInput, getRecipeImageUrl } from "@/lib/utils";
+import { formatTagsForInput, getRecipeImages } from "@/lib/utils";
 
 type EditLinkRecipeFormProps = {
   recipe: Recipe;
@@ -27,7 +26,10 @@ export function EditLinkRecipeForm({ recipe }: EditLinkRecipeFormProps) {
     {},
   );
 
-  const imageUrl = getRecipeImageUrl(recipe);
+  const existingUrls = getRecipeImages(recipe).map((image) => image.url);
+  const [imageUrls, setImageUrls] = useState<string[]>(
+    existingUrls.length > 0 ? existingUrls : [""],
+  );
 
   return (
     <form action={formAction} className="space-y-5">
@@ -46,22 +48,10 @@ export function EditLinkRecipeForm({ recipe }: EditLinkRecipeFormProps) {
         />
       </Field>
 
-      {imageUrl && (
-        <div className="relative aspect-video overflow-hidden rounded-xl border border-stone/15">
-          <Image
-            src={imageUrl}
-            alt={recipe.title}
-            fill
-            className="object-cover"
-            unoptimized
-          />
-        </div>
-      )}
-
-      <input
-        type="hidden"
-        name="image_url"
-        defaultValue={recipe.image_url ?? ""}
+      <RecipePhotosField
+        mode="external"
+        imageUrls={imageUrls}
+        onImageUrlsChange={setImageUrls}
       />
 
       <Field label="Title">
@@ -69,13 +59,7 @@ export function EditLinkRecipeForm({ recipe }: EditLinkRecipeFormProps) {
       </Field>
 
       <Field label="Category">
-        <Select name="category" required defaultValue={recipe.category}>
-          {CATEGORY_IDS.map((id) => (
-            <option key={id} value={id}>
-              {CATEGORIES[id].en} ({CATEGORIES[id].he})
-            </option>
-          ))}
-        </Select>
+        <CategorySelect defaultValue={recipe.category} />
       </Field>
 
       <Field label="Tags" hint="Comma-separated">
