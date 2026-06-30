@@ -2,10 +2,14 @@ import { Header } from "@/components/layout/Header";
 import { DashboardClient } from "@/components/dashboard/DashboardClient";
 import { getAppwriteErrorMessage } from "@/lib/appwrite/errors";
 import { getRecipes } from "@/lib/appwrite/recipes";
-import { isAppwriteConfigured } from "@/lib/appwrite/server";
+import { getAppwriteEnvStatus } from "@/lib/appwrite/server";
 
 export default async function HomePage() {
-  const configured = isAppwriteConfigured();
+  const envStatus = getAppwriteEnvStatus();
+  const configured = envStatus.configured;
+  // #region agent log
+  fetch('http://127.0.0.1:7870/ingest/3e2796c3-9e1e-4eaa-954c-026adc63f002',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'c649fa'},body:JSON.stringify({sessionId:'c649fa',location:'app/page.tsx:HomePage',message:'Appwrite env status',data:{configured,missing:envStatus.missing,vercel:!!process.env.VERCEL},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   let recipes: Awaited<ReturnType<typeof getRecipes>> = [];
   let appwriteError: string | undefined;
 
@@ -30,6 +34,8 @@ export default async function HomePage() {
         <DashboardClient
           recipes={recipes}
           configured={configured}
+          missingEnvVars={envStatus.missing}
+          isVercel={!!process.env.VERCEL}
           error={appwriteError}
         />
       </main>

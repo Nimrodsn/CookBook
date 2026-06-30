@@ -14,12 +14,16 @@ import { collectAllTags, matchesSearch } from "@/lib/utils";
 type DashboardClientProps = {
   recipes: Recipe[];
   configured: boolean;
+  missingEnvVars?: string[];
+  isVercel?: boolean;
   error?: string;
 };
 
 export function DashboardClient({
   recipes,
   configured,
+  missingEnvVars = [],
+  isVercel = false,
   error,
 }: DashboardClientProps) {
   const [activeTab, setActiveTab] = useState<TabId>("all");
@@ -63,10 +67,38 @@ export function DashboardClient({
 
       {!configured && !error && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Appwrite is not configured. Copy{" "}
-          <code className="rounded bg-amber-100 px-1">.env.local.example</code>{" "}
-          to <code className="rounded bg-amber-100 px-1">.env.local</code> and
-          follow <code className="rounded bg-amber-100 px-1">scripts/setup-appwrite.md</code>.
+          Appwrite is not configured.
+          {missingEnvVars.length > 0 ? (
+            <>
+              {" "}
+              Missing environment variable
+              {missingEnvVars.length > 1 ? "s" : ""}:{" "}
+              <code className="rounded bg-amber-100 px-1">
+                {missingEnvVars.join(", ")}
+              </code>
+              {isVercel ? (
+                <>
+                  . Add them in Vercel → Project Settings → Environment Variables,
+                  then redeploy.
+                </>
+              ) : (
+                <>
+                  . Copy{" "}
+                  <code className="rounded bg-amber-100 px-1">.env.local.example</code>{" "}
+                  to <code className="rounded bg-amber-100 px-1">.env.local</code> and
+                  follow <code className="rounded bg-amber-100 px-1">scripts/setup-appwrite.md</code>.
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              {" "}
+              Copy{" "}
+              <code className="rounded bg-amber-100 px-1">.env.local.example</code>{" "}
+              to <code className="rounded bg-amber-100 px-1">.env.local</code> and
+              follow <code className="rounded bg-amber-100 px-1">scripts/setup-appwrite.md</code>.
+            </>
+          )}
         </div>
       )}
 
