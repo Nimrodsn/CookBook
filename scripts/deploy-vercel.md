@@ -28,6 +28,7 @@ Add these in **Project Settings → Environment Variables** for Production, Prev
 | `APPWRITE_API_KEY` | Server API key — mark as sensitive |
 | `APPWRITE_DATABASE_ID` | Database ID |
 | `APPWRITE_RECIPES_COLLECTION_ID` | Collection ID |
+| `APPWRITE_CATEGORIES_COLLECTION_ID` | Categories collection ID (e.g. `categories`) |
 | `APPWRITE_STORAGE_BUCKET_ID` | Bucket ID |
 | `GEMINI_API_KEY` | Google AI Studio API key — mark as sensitive (see `scripts/setup-ai-scan.md`) |
 | `GEMINI_MODEL` | Optional — default `gemini-2.0-flash` |
