@@ -118,6 +118,13 @@ APPWRITE_STORAGE_BUCKET_ID=your_bucket_id
 
 Restart the dev server after updating `.env.local`.
 
+You can also run the automated setup script (creates the `categories` collection and updates `.env.local`):
+
+```bash
+node scripts/setup-appwrite.mjs
+node scripts/verify-appwrite.mjs
+```
+
 ## 8. Verify
 
 1. Run `npm run dev`.
