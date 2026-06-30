@@ -36,7 +36,7 @@ function mapDocument(doc: Record<string, unknown>): Recipe {
     image_file_id: resolvedFileIds[0] ?? null,
     image_urls: resolvedUrls,
     image_file_ids: resolvedFileIds,
-    category: doc.category as Recipe["category"],
+    category: (doc.category as string | null) ?? "",
     tags: (doc.tags as string[]) ?? [],
     ingredients: (doc.ingredients as string | null) ?? null,
     instructions: (doc.instructions as string | null) ?? null,

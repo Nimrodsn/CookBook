@@ -28,5 +28,6 @@ export function CategoryLabels({
 
 export function CategoryInitial({ slug }: { slug: string }) {
   const { getCategoryLabel } = useCategories();
-  return getCategoryLabel(slug).he.charAt(0);
+  const { he } = getCategoryLabel(slug);
+  return he.charAt(0) || "?";
 }

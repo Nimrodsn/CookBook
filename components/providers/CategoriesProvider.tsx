@@ -32,11 +32,18 @@ export function CategoriesProvider({
       categories,
       categorySlugs: categories.map((category) => category.slug),
       getCategoryLabel: (slug: string) => {
-        const category = bySlug.get(slug);
+        const safeSlug = slug ?? "";
+        const category = bySlug.get(safeSlug);
         if (category) {
-          return { en: category.label_en, he: category.label_he };
+          return {
+            en: category.label_en ?? safeSlug,
+            he: category.label_he ?? safeSlug,
+          };
         }
-        return { en: slug, he: slug };
+        return {
+          en: safeSlug || "?",
+          he: safeSlug || "?",
+        };
       },
     };
   }, [categories]);
