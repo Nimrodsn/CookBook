@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { CategoriesProvider } from "@/components/providers/CategoriesProvider";
 import { getCategories, seedDefaultCategories } from "@/lib/appwrite/categories";
@@ -17,6 +17,29 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Family Cookbook",
   description: "A personal digital recipe book for the family",
+  applicationName: "Family Cookbook",
+  icons: {
+    icon: [
+      { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/apple-icon-180.png", sizes: "180x180", type: "image/png" }],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Cookbook",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#c45c26",
 };
 
 export default async function RootLayout({

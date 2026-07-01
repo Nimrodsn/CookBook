@@ -45,6 +45,7 @@ Click **Deploy**. Vercel runs `next build` automatically.
 - [ ] Filters and search work on mobile viewport
 - [ ] Edit and delete a recipe
 - [ ] Scan a recipe photo from your phone (requires `GEMINI_API_KEY` — see `scripts/setup-ai-scan.md`)
+- [ ] Install on Android home screen (see `scripts/install-android.md`)
 
 ## Notes
 
