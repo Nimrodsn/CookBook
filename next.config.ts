@@ -24,6 +24,12 @@ const appwriteHostname = (() => {
 })();
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      // Default is 1MB; recipe photos can be up to 5MB (Vercel caps requests at ~4.5MB).
+      bodySizeLimit: "4mb",
+    },
+  },
   turbopack: {
     root: process.cwd(),
   },

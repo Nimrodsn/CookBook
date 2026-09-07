@@ -2,14 +2,14 @@ import { MAX_RECIPE_IMAGES } from "@/lib/constants";
 import type { RecipeImage } from "@/lib/utils";
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 
 export function validateRecipeUploadFile(file: File): string | null {
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
     return "Image must be JPEG, PNG, or WebP.";
   }
   if (file.size > MAX_UPLOAD_BYTES) {
-    return "Image must be under 5 MB.";
+    return "Image must be under 4 MB.";
   }
   return null;
 }

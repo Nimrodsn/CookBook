@@ -1,3 +1,5 @@
+import { appendDebugEntry } from "@/lib/debug-log-store";
+
 export type DebugLogPayload = {
   sessionId: string;
   runId: string;
@@ -50,6 +52,7 @@ export function debugLog(
     return;
   }
 
+  appendDebugEntry(payload);
   const base = getServerBaseUrl();
   fetch(`${base}/api/debug-log`, {
     method: "POST",
