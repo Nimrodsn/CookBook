@@ -6,7 +6,6 @@ import { Field } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { MAX_RECIPE_IMAGES } from "@/lib/constants";
-import { debugLog } from "@/lib/debug-log";
 import type { RecipeImage } from "@/lib/utils";
 
 type RecipePhotosFieldProps = {
@@ -74,34 +73,6 @@ export function RecipePhotosField({
     }
     hiddenFilesRef.current.files = transfer.files;
   }, [pendingFiles]);
-
-  useEffect(() => {
-    const form = hiddenFilesRef.current?.form;
-    if (!form) return;
-
-    function handleSubmit() {
-      const hiddenCount = hiddenFilesRef.current?.files?.length ?? 0;
-      // #region agent log
-      debugLog({
-        runId: "pre-fix",
-        hypothesisId: "A,F",
-        location: "RecipePhotosField.tsx:submit",
-        message: "form submit photo state",
-        data: {
-          pendingFilesCount: pendingFiles.length,
-          keptImagesCount: keptImages.length,
-          hiddenInputFilesCount: hiddenCount,
-          pendingFileNames: pendingFiles.map((f) => f.name),
-          pendingFileSizes: pendingFiles.map((f) => f.size),
-          pendingFileTypes: pendingFiles.map((f) => f.type),
-        },
-      });
-      // #endregion
-    }
-
-    form.addEventListener("submit", handleSubmit);
-    return () => form.removeEventListener("submit", handleSubmit);
-  }, [pendingFiles, keptImages]);
 
   function handleAddFiles(fileList: FileList | null) {
     if (!fileList?.length) return;
