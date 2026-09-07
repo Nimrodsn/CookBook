@@ -2,6 +2,7 @@ import { ID, Query } from "node-appwrite";
 import type { Recipe, RecipeInput } from "@/lib/types";
 import { getAllRecipeFileIds } from "@/lib/utils";
 import { syncLegacyPrimaryFields } from "@/lib/recipe-images";
+import { debugLog } from "@/lib/debug-log";
 import { deleteRecipeImage } from "./storage";
 import {
   DB_ID,
@@ -110,7 +111,22 @@ export async function createRecipe(data: RecipeInput): Promise<Recipe> {
     }),
   );
 
-  return mapDocument(doc as unknown as Record<string, unknown>);
+  const mapped = mapDocument(doc as unknown as Record<string, unknown>);
+  // #region agent log
+  debugLog({
+    runId: "pre-fix",
+    hypothesisId: "D",
+    location: "recipes.ts:createRecipe:result",
+    message: "createRecipe saved images",
+    data: {
+      recipeId: mapped.$id,
+      savedUrlCount: mapped.image_urls?.length ?? 0,
+      savedFileIdCount: mapped.image_file_ids?.length ?? 0,
+    },
+  });
+  // #endregion
+
+  return mapped;
 }
 
 export async function updateRecipe(
@@ -121,13 +137,64 @@ export async function updateRecipe(
     throw new Error("Appwrite is not configured");
   }
 
-  const doc = await databases.updateDocument(
-    DB_ID,
-    RECIPES_COL,
-    id,
-    withSyncedImageFields(data),
-  );
-  return mapDocument(doc as unknown as Record<string, unknown>);
+  const payload = withSyncedImageFields(data);
+  // #region agent log
+  debugLog({
+    runId: "pre-fix",
+    hypothesisId: "D",
+    location: "recipes.ts:updateRecipe",
+    message: "updateRecipe payload images",
+    data: {
+      recipeId: id,
+      imageUrlCount: Array.isArray(payload.image_urls)
+        ? payload.image_urls.length
+        : null,
+      imageFileIdCount: Array.isArray(payload.image_file_ids)
+        ? payload.image_file_ids.length
+        : null,
+      primaryFileId: payload.image_file_id ?? null,
+    },
+  });
+  // #endregion
+
+  let doc;
+  try {
+    doc = await databases.updateDocument(DB_ID, RECIPES_COL, id, payload);
+  } catch (updateError) {
+    // #region agent log
+    debugLog({
+      runId: "pre-fix",
+      hypothesisId: "D",
+      location: "recipes.ts:updateRecipe:error",
+      message: "updateRecipe failed",
+      data: {
+        recipeId: id,
+        error:
+          updateError instanceof Error
+            ? updateError.message
+            : String(updateError),
+      },
+    });
+    // #endregion
+    throw updateError;
+  }
+
+  const mapped = mapDocument(doc as unknown as Record<string, unknown>);
+  // #region agent log
+  debugLog({
+    runId: "pre-fix",
+    hypothesisId: "D",
+    location: "recipes.ts:updateRecipe:result",
+    message: "updateRecipe saved images",
+    data: {
+      recipeId: id,
+      savedUrlCount: mapped.image_urls?.length ?? 0,
+      savedFileIdCount: mapped.image_file_ids?.length ?? 0,
+    },
+  });
+  // #endregion
+
+  return mapped;
 }
 
 export async function deleteRecipe(id: string): Promise<void> {

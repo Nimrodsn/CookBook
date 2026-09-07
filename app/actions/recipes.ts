@@ -26,6 +26,7 @@ import {
   localRecipeSchema,
   validateCategorySlug,
 } from "@/lib/validations/recipe";
+import { debugLog } from "@/lib/debug-log";
 
 export type ActionState = {
   error?: string;
@@ -40,6 +41,30 @@ async function buildLocalImagesFromFormData(formData: FormData): Promise<
 > {
   const kept = parseKeptImagesFromFormData(formData);
   const newFiles = parseNewImageFiles(formData);
+  const rawImages = formData.getAll("images");
+
+  // #region agent log
+  debugLog({
+    runId: "pre-fix",
+    hypothesisId: "B,E",
+    location: "recipes.ts:buildLocalImagesFromFormData",
+    message: "parsed form image data",
+    data: {
+      keptCount: kept.length,
+      keptUrls: kept.map((i) => i.url?.slice(0, 80)),
+      keptFileIds: kept.map((i) => i.fileId),
+      rawImagesCount: rawImages.length,
+      rawImageTypes: rawImages.map((f) =>
+        f && typeof f === "object"
+          ? `${(f as { constructor?: { name?: string } }).constructor?.name ?? "unknown"}:${(f as { size?: number }).size ?? "na"}:${(f as { type?: string }).type ?? "na"}`
+          : String(typeof f),
+      ),
+      newFilesCount: newFiles.length,
+      newFileNames: newFiles.map((f) => f.name),
+      newFileTypes: newFiles.map((f) => f.type),
+    },
+  });
+  // #endregion
 
   for (const file of newFiles) {
     const validationError = validateRecipeUploadFile(file);
@@ -63,12 +88,54 @@ async function buildLocalImagesFromFormData(formData: FormData): Promise<
         urls.push(item.previewUrl);
         fileIds.push(item.fileId);
       }
-    } catch {
+      // #region agent log
+      debugLog({
+        runId: "pre-fix",
+        hypothesisId: "C",
+        location: "recipes.ts:buildLocalImagesFromFormData:uploaded",
+        message: "upload succeeded",
+        data: {
+          uploadedCount: uploaded.length,
+          fileIds: uploaded.map((u) => u.fileId),
+        },
+      });
+      // #endregion
+    } catch (uploadError) {
+      // #region agent log
+      debugLog({
+        runId: "pre-fix",
+        hypothesisId: "C",
+        location: "recipes.ts:buildLocalImagesFromFormData:uploadError",
+        message: "upload failed",
+        data: {
+          error:
+            uploadError instanceof Error
+              ? uploadError.message
+              : String(uploadError),
+        },
+      });
+      // #endregion
       return { error: "Failed to upload image" };
     }
   }
 
-  return { imageFields: syncLegacyPrimaryFields(urls, fileIds) };
+  const imageFields = syncLegacyPrimaryFields(urls, fileIds);
+  // #region agent log
+  debugLog({
+    runId: "pre-fix",
+    hypothesisId: "E",
+    location: "recipes.ts:buildLocalImagesFromFormData:result",
+    message: "final image fields",
+    data: {
+      urlCount: imageFields.image_urls.length,
+      fileIdCount: imageFields.image_file_ids.length,
+      primaryUrl: imageFields.image_url?.slice(0, 80) ?? null,
+      primaryFileId: imageFields.image_file_id,
+    },
+  });
+  // #endregion
+
+  return { imageFields };
 }
 
 async function validateRecipeCategory(category: string): Promise<string | null> {
