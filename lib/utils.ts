@@ -9,22 +9,30 @@ export function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
+export function getRecipeImageServeUrl(fileId: string): string {
+  return `/api/images/${fileId}`;
+}
+
 export function getRecipeImages(recipe: Recipe): RecipeImage[] {
   const urls = recipe.image_urls?.filter(Boolean) ?? [];
   const fileIds = recipe.image_file_ids ?? [];
 
   if (urls.length > 0) {
-    return urls.map((url, index) => ({
-      url,
-      fileId: fileIds[index]?.trim() ? fileIds[index] : null,
-    }));
+    return urls.map((url, index) => {
+      const fileId = fileIds[index]?.trim() ? fileIds[index] : null;
+      return {
+        url: fileId ? getRecipeImageServeUrl(fileId) : url,
+        fileId,
+      };
+    });
   }
 
   if (recipe.image_url) {
+    const fileId = recipe.image_file_id?.trim() ? recipe.image_file_id : null;
     return [
       {
-        url: recipe.image_url,
-        fileId: recipe.image_file_id ?? null,
+        url: fileId ? getRecipeImageServeUrl(fileId) : recipe.image_url,
+        fileId,
       },
     ];
   }

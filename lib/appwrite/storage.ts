@@ -3,16 +3,12 @@ import { InputFile } from "node-appwrite/file";
 import { MAX_RECIPE_IMAGES } from "@/lib/constants";
 import {
   BUCKET_ID,
-  getEndpoint,
-  getProjectId,
   isAppwriteConfigured,
   storage,
 } from "./server";
 
 export function getFilePreviewUrl(fileId: string): string {
-  const endpoint = getEndpoint();
-  const projectId = getProjectId();
-  return `${endpoint}/storage/buckets/${BUCKET_ID}/files/${fileId}/preview?project=${projectId}`;
+  return `/api/images/${fileId}`;
 }
 
 export async function uploadRecipeImage(file: File): Promise<{
